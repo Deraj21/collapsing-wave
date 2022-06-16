@@ -1,0 +1,25 @@
+{
+  "name": "collapsing-wave",
+  "version": "1.0.0",
+  "description": "map generation using collapsing wave function",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Deraj21/collapsing-wave.git"
+  },
+  "keywords": [
+    "collapsing",
+    "wave",
+    "map",
+    "generation"
+  ],
+  "author": "Jared Tanner",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Deraj21/collapsing-wave/issues"
+  },
+  "homepage": "https://github.com/Deraj21/collapsing-wave#readme"
+}
