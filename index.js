@@ -10,7 +10,3 @@ Array.prototype.compare = function(arr) {
 }
 
 let map = new Map(50, 50)
-
-map.generate()
-
-map.draw()

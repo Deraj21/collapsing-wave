@@ -10,6 +10,8 @@ class Map {
         this.board = []
 
         this.createBoard()
+        this.generate()
+        this.draw()
     }
 
     createBoard() {
@@ -18,14 +20,27 @@ class Map {
         for (let r = 0; r < numRows; r++) {
             let row = []
             for (let c = 0; c < numCols; c++) {
-                row.push("")
+                row.push({
+                    terrain: "",
+                    options: [...mapData[""].all]
+                })
             }
             this.board.push(row)
         }
     }
 
     generate() {
+        const { numCols, numRows } = this
 
+        for (let count = 0; count < numCols * numRows; count++){
+
+            // find the cell with the least "entropy"
+
+            // set that e at random from it's list of available options
+
+        }
+
+        /*
         this.board.forEach((row, r) => {
             row.forEach((col, c) => {
                 let options = [ ...mapData[""].all ]
@@ -46,6 +61,7 @@ class Map {
 
             })
         })
+        */
     }
 
     print(useLongNames = false) {
@@ -85,7 +101,7 @@ class Map {
         board.forEach((row, r) => {
             row.forEach((col, c) => {
 
-                this.drawCell(r, c, mapData[col].color)
+                this.drawCell(r, c, mapData[col.terrain].color)
 
             })
         })

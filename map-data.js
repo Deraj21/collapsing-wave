@@ -1,7 +1,7 @@
 const data = {
     "": {
         "nickname": "",
-        "color": "water",
+        "color": "darkgray",
         "all": [
             "water",
             "sand",
