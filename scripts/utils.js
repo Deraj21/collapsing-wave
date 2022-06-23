@@ -1,5 +1,8 @@
 export function randomFromList(arr) {
-    return arr[Math.floor(Math.random() * arr.length)]
+    if (arr.length){
+        return arr[Math.floor(Math.random() * arr.length)]
+    }
+    return null
 }
 
 

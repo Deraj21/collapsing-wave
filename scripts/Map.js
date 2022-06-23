@@ -11,7 +11,7 @@ class Map {
 
         this.createBoard()
         this.generate()
-        this.draw()
+        // this.draw()
     }
 
     createBoard() {
@@ -22,55 +22,155 @@ class Map {
             for (let c = 0; c < numCols; c++) {
                 row.push({
                     terrain: "",
-                    options: [...mapData[""].all]
+                    options: [...mapData[""].all],
+                    collapsedThisRound: false
                 })
             }
             this.board.push(row)
         }
     }
 
+    findLeastEntropy() {
+        const { board } = this
+
+        // get all cells with least entropy
+        let min = mapData[""].all.length
+        let leastList = []
+
+        board.forEach((row, r) => {
+            row.forEach((col, c) => {
+                let l = col.options.length
+                if (col.terrain) {
+                    return
+                } else if (l === min) {
+                    leastList.push({ r, c })
+                } else if (l < min) {
+                    min = l
+                    leastList = []
+                    leastList.push({ r, c })
+                }
+            })
+        })
+
+        // pick a cell at random
+        return randomFromList(leastList)
+    }
+
+    getNeighborOptions(parentOptions) {
+        let newOptions = []
+
+        parentOptions.forEach(o => {
+            newOptions = [...newOptions, ...mapData[o].all]
+        })
+
+        return newOptions.filterDuplicates()
+    }
+
+    collapseNeighbors(r, c, cell) {
+        // filter possible options for other cells based on that choice
+        // north
+        const { terrain, options } = cell
+        const { numRows, numCols } = this
+        let neighborOptions = this.getNeighborOptions(options)
+
+        let north = null
+        if (r - 1 >= 0) {
+            north = this.board[r - 1][c]
+            if (north.terrain || north.options.length === 1 || north.collapsedThisRound) {
+                north = null
+            } else {
+                north.options = north.options.compare(neighborOptions)
+                north.collapsedThisRound = true
+            }
+        }
+
+        // south
+        let south = null
+        if (r + 1 < numRows) {
+            south = this.board[r + 1][c]
+            if (south.terrain || south.options.length === 1 || south.collapsedThisRound) {
+                south = null
+            } else {
+                south.options = south.options.compare(neighborOptions)
+                south.collapsedThisRound = true
+            }
+        }
+        
+        // east
+        let east = null
+        if (c + 1 < numCols) {
+            east = this.board[r][c + 1]
+            if (east.terrain || east.options.length === 1 || east.collapsedThisRound) {
+                east = null
+            } else {
+                east.options = east.options.compare(neighborOptions)
+                east.collapsedThisRound = true
+            }
+        }
+        
+        // west
+        let west = null
+        if (c - 1 >= 0) {
+            west = this.board[r][c - 1]
+            if (west.terrain || west.options.length === 1 || west.collapsedThisRound) {
+                west = null
+            } else {
+                west.options = west.options.compare(neighborOptions)
+                west.collapsedThisRound = true
+            }
+        }
+        
+        if (north) {
+            this.collapseNeighbors(r - 1, c, north)
+        }
+        if (south) {
+            this.collapseNeighbors(r + 1, c, south)
+        }
+        if (east) {
+            this.collapseNeighbors(r, c + 1, east)
+        }
+        if (west) {
+            this.collapseNeighbors(r, c - 1, west)
+        }
+    }
+
     generate() {
         const { numCols, numRows } = this
 
-        for (let count = 0; count < numCols * numRows; count++){
+        for (let count = 0; count < numCols * numRows; count++) {
 
-            // find the cell with the least "entropy"
+            let coords = this.findLeastEntropy()
+            
+            let { r, c } = coords
+            let cell = this.board[r][c]
 
-            // set that e at random from it's list of available options
+            // set terrain type at random from it's list of options
+            let terrain = randomFromList(cell.options)
+            cell.options = [terrain]
+            cell.terrain = terrain
+
+            this.drawCell(r, c, mapData[cell.terrain].color)
+
+            cell.collapsedThisRound = true
+            this.collapseNeighbors(r, c, cell)
+
+            this.board.forEach(row => {
+                row.forEach(col => {
+                    col.collapsedThisRound = false
+                })
+            })
 
         }
-
-        /*
-        this.board.forEach((row, r) => {
-            row.forEach((col, c) => {
-                let options = [ ...mapData[""].all ]
-
-                let n = this.board[r-1] !== undefined ? this.board[r-1][c] : ""
-                let s = this.board[r+1] !== undefined ? this.board[r+1][c] : ""
-                let e = this.board[r][c+1] !== undefined ? this.board[r][c+1] : ""
-                let w = this.board[r][c-1] !== undefined ? this.board[r][c-1] : ""
-
-                console.log()
-
-                options = options.compare(mapData[n].all)
-                options = options.compare(mapData[s].all)
-                options = options.compare(mapData[e].all)
-                options = options.compare(mapData[w].all)
-
-                this.board[r][c] = randomFromList(options)
-
-            })
-        })
-        */
     }
 
-    print(useLongNames = false) {
+    printBoard(useLongNames = false) {
         let print = ``
 
         this.board.forEach(row => {
 
             row.forEach(col => {
-                print += `'${mapData[col].nickname}' `
+                let name = mapData[col.terrain].nickname
+                print += `'${name ? name : "  "}' `
                 // print += " "
             })
             print += `\n\n`
@@ -79,7 +179,7 @@ class Map {
         console.log(print)
     }
 
-    drawCell(r, c, color){
+    drawCell(r, c, color) {
         const { numCols, numRows } = this
         const w = W / numCols, h = H / numRows
         ctx.fillStyle = color

@@ -9,4 +9,22 @@ Array.prototype.compare = function(arr) {
     })
 }
 
-let map = new Map(50, 50)
+Array.prototype.filterDuplicates = function() {
+    let newArray = []
+    this.forEach(item => {
+        if (newArray.includes(item)){
+
+        } else {
+            newArray.push(item)
+        }
+    })
+
+    return newArray
+}
+
+
+const n = 20
+
+let map = new Map(n, n)
+
+
