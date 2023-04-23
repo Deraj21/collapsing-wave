@@ -23,7 +23,7 @@ Array.prototype.filterDuplicates = function() {
 }
 
 
-const n = 20
+const n = 50
 
 let map = new Map(n, n)
 

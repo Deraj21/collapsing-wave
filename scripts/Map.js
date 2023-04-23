@@ -8,10 +8,15 @@ class Map {
         this.numCols = numCols
 
         this.board = []
+        this.setCount = 0
 
         this.createBoard()
+
+        console.time("generate")
         this.generate()
-        // this.draw()
+        console.timeEnd("generate")
+
+        this.draw()
     }
 
     createBoard() {
@@ -23,7 +28,8 @@ class Map {
                 row.push({
                     terrain: "",
                     options: [...mapData[""].all],
-                    collapsedThisRound: false
+                    collapsedThisRound: false,
+                    setOrder: 0
                 })
             }
             this.board.push(row)
@@ -68,11 +74,14 @@ class Map {
 
     collapseNeighbors(r, c, cell) {
         // filter possible options for other cells based on that choice
-        // north
         const { terrain, options } = cell
+        if (options.length >= mapData[""].all.length) {
+            return
+        }
         const { numRows, numCols } = this
         let neighborOptions = this.getNeighborOptions(options)
 
+        // north
         let north = null
         if (r - 1 >= 0) {
             north = this.board[r - 1][c]
@@ -95,7 +104,7 @@ class Map {
                 south.collapsedThisRound = true
             }
         }
-        
+
         // east
         let east = null
         if (c + 1 < numCols) {
@@ -107,7 +116,7 @@ class Map {
                 east.collapsedThisRound = true
             }
         }
-        
+
         // west
         let west = null
         if (c - 1 >= 0) {
@@ -119,7 +128,7 @@ class Map {
                 west.collapsedThisRound = true
             }
         }
-        
+
         if (north) {
             this.collapseNeighbors(r - 1, c, north)
         }
@@ -134,13 +143,19 @@ class Map {
         }
     }
 
+    randomOption(options) {
+        options.map(option => {
+            
+        })
+    }
+
     generate() {
         const { numCols, numRows } = this
 
         for (let count = 0; count < numCols * numRows; count++) {
 
             let coords = this.findLeastEntropy()
-            
+
             let { r, c } = coords
             let cell = this.board[r][c]
 
@@ -149,7 +164,8 @@ class Map {
             cell.options = [terrain]
             cell.terrain = terrain
 
-            this.drawCell(r, c, mapData[cell.terrain].color)
+            this.setCount++
+            cell.setOrder = this.setCount
 
             cell.collapsedThisRound = true
             this.collapseNeighbors(r, c, cell)
@@ -159,7 +175,6 @@ class Map {
                     col.collapsedThisRound = false
                 })
             })
-
         }
     }
 
@@ -197,14 +212,27 @@ class Map {
 
     draw() {
         const { board } = this
+        let flattened = []
+        let waitTime = 0 // miliseconds
 
         board.forEach((row, r) => {
             row.forEach((col, c) => {
-
-                this.drawCell(r, c, mapData[col.terrain].color)
-
+                let cell = { ...col, r, c }
+                flattened.push(cell)
             })
         })
+
+        flattened
+            .sort((a, b) => a.setOrder - b.setOrder)
+            .forEach(cell => {
+                if (waitTime) {
+                    setTimeout(() => {
+                        this.drawCell(cell.r, cell.c, mapData[cell.terrain].color)
+                    }, cell.setOrder * waitTime)
+                } else {
+                    this.drawCell(cell.r, cell.c, mapData[cell.terrain].color)
+                }
+            })
     }
 
     drawSquare(r, c) {

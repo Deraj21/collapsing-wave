@@ -13,18 +13,16 @@ const data = {
     "water": {
         "nickname": "wa",
         "color": "Turquoise",
+        "weight": 2,
         "all": [
             "sand",
             "water"
-        ],
-        "n": null,
-        "s": null,
-        "e": null,
-        "w": null
+        ]
     },
     "sand": {
         "nickname": "sa",
         "color": "Moccasin",
+        "weight": 1,
         "all": [
             "water",
             "sand",
@@ -34,6 +32,7 @@ const data = {
     "grass": {
         "nickname": "gr",
         "color": "YellowGreen",
+        "weight": 3,
         "all": [
             "grass",
             "sand",
@@ -43,6 +42,7 @@ const data = {
     "forest": {
         "nickname": "fo",
         "color": "ForestGreen",
+        "weight": 3,
         "all": [
             "forest",
             "grass",
@@ -52,6 +52,7 @@ const data = {
     "thick_forest": {
         "nickname": "tf",
         "color": "DarkSlateGray",
+        "weight": 1,
         "all": [
             "thick_forest",
             "forest"
